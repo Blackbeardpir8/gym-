@@ -1,11 +1,13 @@
-from django.shortcuts import render ,redirect
+from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate,login,logout
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 
-# Create your views here.
+
 def Home(request):
-    return render (request, "index.html")
+    return render(request, "index.html")
+
 
 def signup(request):
     if request.method == "POST":
@@ -44,9 +46,9 @@ def signup(request):
 
         try:
             user = User.objects.create_user(
-                username=phone, 
+                username=phone,  
                 email=email,
-                password=password,
+                password=password  
             )
             user.save()
 
@@ -58,6 +60,7 @@ def signup(request):
 
     return render(request, "signup.html")
 
+# Login View
 def handlelogin(request):
     if request.method == "POST":
         username = request.POST.get('usernumber')
@@ -76,7 +79,8 @@ def handlelogin(request):
     return render(request, "login.html")
 
 
+@login_required 
 def handellogout(request):
     logout(request)
-    messages.success(request,"Logout Successfully")
+    messages.success(request, "Logout Successfully")
     return redirect('/login')
