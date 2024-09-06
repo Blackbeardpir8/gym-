@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from authapp.models import Contact
 
 
 def Home(request):
@@ -84,3 +85,20 @@ def handellogout(request):
     logout(request)
     messages.success(request, "Logout Successfully")
     return redirect('/login')
+
+
+def contact(request):
+    if request.method == "POST":
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        description = request.POST.get('description')
+
+        user_contact = Contact(name=name, email=email, phone=phone, description=description)
+        user_contact.save()
+
+        messages.info(request, "Thanks for contacting us! We will get back to you as soon as possible.")
+
+        return redirect('/contact')
+
+    return render(request, "contact.html")
