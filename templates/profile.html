@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}
+Profile
+{% endblock title %}
+
+{% block head %}
+
+<h1>{{ request.user.username }}'s Profile</h1>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-3"></div>
+
+        <div class="col-md-8">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+            
+            {% if posts %}
+            {% for post in posts %}
+            <ul class="list-group">
+                <li class="list-group-item">Full Name: {{ post.fullname }}</li>
+                <li class="list-group-item">Email: {{ post.email }}</li>
+                <li class="list-group-item">Gender: {{ post.gender }}</li>
+                <li class="list-group-item">Phone: {{ post.phone }}</li>
+                <li class="list-group-item">Date of Birth: {{ post.dob }}</li>
+                <li class="list-group-item">Membership Plan: {{ post.select_membership.plan }}</li>
+                <li class="list-group-item">Trainer: {{ post.select_trainer.name }}</li>
+                <li class="list-group-item">Reference: {{ post.reference }}</li>
+                <li class="list-group-item">Address: {{ post.address }}</li>
+                <li class="list-group-item">Emergency Contact: {{ post.emergency_contact }}</li>
+                <li class="list-group-item">Date of Joining: {{ post.date_of_joining }}</li>
+                <li class="list-group-item">Payment Status: {{ post.payment_status }}</li>
+                <li class="list-group-item">Price: {{ post.price }}</li>
+                <li class="list-group-item">Due Date: {{ post.due_date }}</li>
+            </ul>
+            {% endfor %}
+            {% else %}
+            <p>No enrollment data available.</p>
+            {% endif %}
+
+        </div>
+
+        <div class="col-md-3"></div>
+    </div>
+</div>
+
+{% endblock head %}

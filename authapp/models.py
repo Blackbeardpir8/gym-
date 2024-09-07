@@ -51,20 +51,31 @@ class Enrollment(models.Model):
     fullname = models.CharField(max_length=100)
     email = models.EmailField()
     gender = models.CharField(max_length=25, choices=GENDER_CHOICES)
-    phone = models.CharField(max_length=15) 
+    phone = models.CharField(max_length=15)
     dob = models.DateField()
-    select_membership = models.ForeignKey(Membership_Plan, on_delete=models.CASCADE)  
-    select_trainer = models.ForeignKey(Trainer, on_delete=models.CASCADE)  
-    reference = models.CharField(max_length=100)
+    select_membership = models.ForeignKey(Membership_Plan, on_delete=models.CASCADE)
+    select_trainer = models.ForeignKey(Trainer, on_delete=models.CASCADE)
+    reference = models.CharField(max_length=100, null=True, blank=True)
     address = models.TextField()
-    emergency_contact = models.CharField(max_length=15)  
-    date_of_joining = models.DateTimeField(auto_now_add=True, blank=True)
+    emergency_contact = models.CharField(max_length=15)
+    date_of_joining = models.DateField(auto_now_add=True, null=False, blank=False)
     payment_status = models.CharField(max_length=100, choices=PAYMENT_STATUS_CHOICES, null=True, blank=True)
     price = models.IntegerField(null=True, blank=True)
     due_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.fullname} - {self.email}"
+
+    def save(self, *args, **kwargs):
+        # Automatically set the price from the membership plan
+        if not self.price and self.select_membership:
+            self.price = self.select_membership.price
+
+        # Automatically set payment status to 'Pending' if it's not provided
+        if not self.payment_status:
+            self.payment_status = 'Pending'
+
+        super().save(*args, **kwargs)
     
 
 

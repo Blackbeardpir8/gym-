@@ -28,18 +28,18 @@ Enroll
 
             <!-- Email -->
             <div class="form-group mt-3">
-                <input type="email" class="form-control" value="{{ request.user.email }}" name="email" placeholder="Enter your Email" required>
+                <input type="email" class="form-control" value="{{ request.user.email }}" name="email" placeholder="Enter your Email" readonly required>
             </div>
 
             <!-- Phone -->
             <div class="form-group mt-3">
-                <input type="tel" class="form-control" name="phone" placeholder="Enter your Phone Number" required>
+                <input type="tel" class="form-control" name="phone" value="{{ request.user.username }}" placeholder="Enter your Phone Number" readonly required>
             </div>
 
             <!-- Date of Birth (dob) -->
             <div class="form-group mt-3">
                 <label for="dob">Date of Birth</label>
-                <input type="date" class="form-control" id="dob" name="dob" placeholder="dd-mm-yyyy" required>
+                <input type="date" class="form-control" id="dob" name="dob" placeholder="Date of Birth" required>
             </div>
 
             <!-- Gender -->

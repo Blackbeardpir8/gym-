@@ -10,24 +10,23 @@
   <meta name="keywords" content="">
 
   <!-- Favicons -->
-  <link href="static/assets/img/favicon.png" rel="icon">
-  <link href="static/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
+  <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
 
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Raleway:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <!-- Vendor CSS Files -->
-  <link href="static/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="static/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="static/assets/vendor/aos/aos.css" rel="stylesheet">
-  <link href="static/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
-  <link href="static/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/aos/aos.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
 
   <!-- Main CSS File -->
-  <link href="static/assets/css/main.css" rel="stylesheet">
-
+  <link href="{% static 'assets/css/main.css' %}" rel="stylesheet">
 
 </head>
 
@@ -38,7 +37,7 @@
 
       <a href="/" class="logo d-flex align-items-center me-auto me-lg-0">
         <!-- Uncomment the line below if you also wish to use an image logo -->
-        <!-- <img src="static/assets/img/logo.png" alt=""> -->
+        <!-- <img src="{% static 'assets/img/logo.png' %}" alt=""> -->
         <h1 class="sitename">GYM BHILAI</h1>
         <span>.</span>
       </a>
@@ -50,12 +49,13 @@
           <li><a href="/services">Services</a></li>
           <li><a href="/gallery">Gallery</a></li>
           <li><a href="/contact">Contact</a></li>
-          <li class="dropdown"><a href="#"><span>Memberships</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+          <li class="dropdown">
+            <a href="#"><span>Memberships</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
               <li><a href="/enroll">Enroll</a></li>
               <li><a href="#">Workouts</a></li>
               <li><a href="#">Tracker</a></li>
-              <li><a href="#">View Profile</a></li>
+              <li><a href="/profile">View Profile</a></li>
             </ul>
           </li>
           <li><a href="/awards">Awards</a></li>
@@ -63,16 +63,20 @@
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
 
-      {% if not request.user.is_authenticated %}
-      <a class="btn-getstarted" href="/signup">Sign Up</a>
-      {% else %}
-      <a class="btn-getstarted" href="/logout">Logout</a>
-      {% endif %}
-  
-      {% if request.user.is_authenticated %}
-      <a href="/">Welcome</a>
-      {% endif %}
+      <div class="auth-buttons">
+        {% if not request.user.is_authenticated %}
+          <a class="btn-getstarted" href="/login">Log In</a>
+          <a class="btn-getstarted" href="/signup">Sign Up</a>
+        {% else %}
+          <a class="btn-getstarted" href="/logout">Logout</a>
+          <a class="btn-getstarted" href="/">Welcome {{ request.user.username }}</a>
+        {% endif %}
+      </div>
     </div>
+  </header>
+
+</body>
+</html>
   </header>
 
   <main class="main">

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
@@ -8,6 +8,16 @@ from authapp.models import Contact,Enrollment,Membership_Plan,Trainer
 
 def Home(request):
     return render(request, "index.html")
+
+
+def profile(request, enroll_id=None):
+    if not request.user.is_authenticated:
+        messages.warning(request, "Please log in and try again.")
+        return redirect('/login')
+    user_phone = request.user
+    posts = Enrollment.objects.filter(phone=user_phone)
+    context = {"posts":posts}
+    return render(request, "profile.html",context)
 
 
 def signup(request):
@@ -161,3 +171,5 @@ def enroll(request):
         return redirect('/')
 
     return render(request, "enroll.html", context)
+
+
