@@ -9,4 +9,67 @@ class Contact(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.email})"  
+    
+
+class Trainer(models.Model):
+    GENDER_CHOICES = [
+        ('Male', 'Male'),
+        ('Female', 'Female'),
+        ('Other', 'Other'),
+    ]
+
+    name = models.CharField(max_length=100)
+    gender = models.CharField(max_length=25, choices=GENDER_CHOICES)
+    phone = models.CharField(max_length=15)  
+    salary = models.DecimalField(max_digits=10, decimal_places=2)
+    experience = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.name} - {self.experience} years of experience"
+    
+
+class Membership_Plan(models.Model):
+    plan = models.CharField(max_length=200)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.plan} - ₹{self.price}"
+
+class Enrollment(models.Model):
+    GENDER_CHOICES = [
+        ('Male', 'Male'),
+        ('Female', 'Female'),
+        ('Other', 'Other'),
+    ]
+    
+    PAYMENT_STATUS_CHOICES = [
+        ('Paid', 'Paid'),
+        ('Pending', 'Pending'),
+        ('Overdue', 'Overdue'),
+    ]
+
+    fullname = models.CharField(max_length=100)
+    email = models.EmailField()
+    gender = models.CharField(max_length=25, choices=GENDER_CHOICES)
+    phone = models.CharField(max_length=15) 
+    dob = models.DateField()
+    select_membership = models.ForeignKey(Membership_Plan, on_delete=models.CASCADE)  
+    select_trainer = models.ForeignKey(Trainer, on_delete=models.CASCADE)  
+    reference = models.CharField(max_length=100)
+    address = models.TextField()
+    emergency_contact = models.CharField(max_length=15)  
+    date_of_joining = models.DateTimeField(auto_now_add=True, blank=True)
+    payment_status = models.CharField(max_length=100, choices=PAYMENT_STATUS_CHOICES, null=True, blank=True)
+    price = models.IntegerField(null=True, blank=True)
+    due_date = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.fullname} - {self.email}"
+    
+
+
+    
+
+
+
 

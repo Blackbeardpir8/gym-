@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from authapp.models import Contact
+from authapp.models import Contact,Enrollment,Membership_Plan,Trainer
 
 
 def Home(request):
@@ -102,3 +102,62 @@ def contact(request):
         return redirect('/contact')
 
     return render(request, "contact.html")
+
+
+def enroll(request):
+    # Check if the user is authenticated
+    if not request.user.is_authenticated:
+        messages.warning(request, "Please log in and try again.")
+        return redirect('/login')
+
+    # Get memberships and trainers to display in the form
+    memberships = Membership_Plan.objects.all().order_by('price')
+    trainers = Trainer.objects.all()
+    context = {"memberships": memberships, "trainers": trainers}
+
+    if request.method == "POST":
+        # Get form data
+        fullname = request.POST.get('fullname')
+        email = request.POST.get('email')
+        gender = request.POST.get('gender')
+        phone_number = request.POST.get('phone')
+        dob = request.POST.get('dob')
+        member_id = request.POST.get('select_membership')
+        trainer_id = request.POST.get('trainer')
+        reference = request.POST.get('reference')
+        address = request.POST.get('address')
+        emergency_contact = request.POST.get('emergency_contact')
+
+        # Get the selected membership and trainer
+        try:
+            membership = Membership_Plan.objects.get(id=member_id)
+            trainer = Trainer.objects.get(id=trainer_id)
+        except Membership_Plan.DoesNotExist:
+            messages.error(request, "Selected membership does not exist.")
+            return redirect('enroll')
+        except Trainer.DoesNotExist:
+            messages.error(request, "Selected trainer does not exist.")
+            return redirect('enroll')
+
+        # Create a new Enrollment entry
+        query = Enrollment(
+            fullname=fullname,
+            email=email,
+            gender=gender,
+            phone=phone_number,
+            dob=dob,
+            select_membership=membership,
+            select_trainer=trainer,
+            reference=reference,
+            address=address,
+            emergency_contact=emergency_contact  # Save emergency contact
+        )
+
+        # Save the enrollment data to the database
+        query.save()
+
+        # Display a success message and redirect
+        messages.success(request, "Thanks for enrolling!")
+        return redirect('/')
+
+    return render(request, "enroll.html", context)

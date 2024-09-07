@@ -7,4 +7,5 @@ urlpatterns = [
     path('login',views.handlelogin,name="handlelogin"),
     path('logout',views.handellogout,name="handellogout"),
     path('contact',views.contact,name="contact"),
+    path('enroll',views.enroll,name="enroll")
 ]
