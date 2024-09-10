@@ -78,8 +78,17 @@ class Enrollment(models.Model):
         super().save(*args, **kwargs)
     
 
+class Attendance(models.Model):
+    phone = models.CharField(max_length=15)
+    select_date = models.DateField()  
+    login = models.TimeField()  
+    logout = models.TimeField() 
+    select_workout = models.CharField(max_length=100)  
+    trained_by = models.ForeignKey(Trainer, on_delete=models.SET_NULL, null=True)  
 
-    
+    def __str__(self):
+        return f"Attendance for {self.select_date} - {self.trained_by}"
+
 
 
 

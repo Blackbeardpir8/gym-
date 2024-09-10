@@ -3,7 +3,9 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from authapp.models import Contact,Enrollment,Membership_Plan,Trainer
+from authapp.models import Contact,Enrollment,Membership_Plan,Trainer,Attendance
+from datetime import datetime
+from django.db.models import Count
 
 
 def Home(request):
@@ -172,4 +174,108 @@ def enroll(request):
 
     return render(request, "enroll.html", context)
 
+
+@login_required
+def attendance(request):
+    # Fetch the list of trainers to display in the form
+    SelectTrainer = Trainer.objects.all()
+    context = {"SelectTrainer": SelectTrainer}
+
+    # Handle form submission
+    if request.method == 'POST':
+        phone = request.POST.get('phone')
+        select_date = request.POST.get('select_date')
+        login_time = request.POST.get('login')
+        logout_time = request.POST.get('logout')
+        workout_type = request.POST.get('select_workout')
+        trainer_id = request.POST.get('trained_by')  # Use trainer_id from the form
+
+        # Check if the form fields are filled
+        if not (select_date and login_time and logout_time and workout_type and trainer_id):
+            messages.error(request, "All fields are required.")
+            return render(request, "attendance.html", context)
+
+        # Try to fetch the selected trainer by their ID
+        try:
+            trainer = Trainer.objects.get(id=trainer_id)
+        except Trainer.DoesNotExist:
+            messages.error(request, "Selected trainer does not exist.")
+            return render(request, "attendance.html", context)
+
+        # Create the attendance record
+        attendance = Attendance(
+            phone=phone,
+            select_date=select_date,
+            login=login_time,
+            logout=logout_time,
+            select_workout=workout_type,
+            trained_by=trainer  # Use the selected trainer
+        )
+        attendance.save()  # Save to the database
+        messages.success(request, "Attendance recorded successfully!")
+        return redirect('/attendance')
+
+    # Render the attendance form in GET request
+    return render(request, "attendance.html", context)
+
+@login_required
+def tracker(request):
+    now = datetime.now()
+    current_year = now.year
+    current_month = now.month
+
+    # List of months and years for dropdown
+    months = [
+        ('01', 'January'), ('02', 'February'), ('03', 'March'),
+        ('04', 'April'), ('05', 'May'), ('06', 'June'),
+        ('07', 'July'), ('08', 'August'), ('09', 'September'),
+        ('10', 'October'), ('11', 'November'), ('12', 'December')
+    ]
+    years = [str(year) for year in range(current_year - 10, current_year + 1)]
+
+    # Get the selected year and month from GET request
+    selected_year = request.GET.get('year', str(current_year))
+    selected_month = request.GET.get('month', str(current_month).zfill(2))
+
+    # Validate year and month
+    valid_years = years
+    valid_months = dict(months).keys()
+    if selected_year not in valid_years:
+        selected_year = str(current_year)
+    if selected_month not in valid_months:
+        selected_month = str(current_month).zfill(2)
+
+    # Fetch attendance records for the selected year and month
+    attendance_records = Attendance.objects.filter(
+        phone=request.user.username,
+        select_date__year=selected_year,
+        select_date__month=selected_month
+    )
+
+    # Fetch monthly attendance summary
+    monthly_attendance = (
+        Attendance.objects.filter(phone=request.user.username)
+        .values('select_date__year', 'select_date__month')
+        .annotate(total_attendance=Count('id'))
+        .order_by('select_date__year', 'select_date__month')
+    )
+
+    # Fetch unique workout types from Attendance records
+    workout_types = Attendance.objects.values_list('select_workout', flat=True).distinct()
+
+    # Debugging output (optional)
+    print("Monthly Attendance:", list(monthly_attendance))
+    print("Attendance Records:", list(attendance_records))
+    print("Workout Types:", list(workout_types))
+
+    context = {
+        'monthly_attendance': monthly_attendance,
+        'attendance': attendance_records,
+        'months': months,
+        'years': years,
+        'selected_year': selected_year,
+        'selected_month': selected_month,
+        'workout_types': workout_types
+    }
+    return render(request, "tracker.html", context)
 

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}
+Attendance
+{% endblock title %}
+
+{% block head %} 
+<h1>Attendance</h1>
+
+<div class="container mt-2">
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <strong></strong> {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+    
+            <form action="/attendance" method="post">{% csrf_token %}
+
+                <div class="form-group mt-3">
+                    <input type="tel" class="form-control" name="phone" value="{{ request.user.username }}" placeholder="Enter your Phone Number" readonly required>
+                </div>
+
+                <div class="form-group">
+                    <label for="select_date">Select Date</label>
+                    <input type="date" class="form-control mb-2" name="select_date" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="login">Login Time</label>
+                    <input type="time" class="form-control mb-2" name="login" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="logout">Logout Time</label>
+                    <input type="time" class="form-control mb-2" name="logout" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="select_workout">Workout Type</label>
+                    <select class="form-control mb-2" name="select_workout" required>
+                        <option selected disabled>Select Workout</option>
+                        <option value="Biceps/Triceps">Biceps/Triceps</option>
+                        <option value="Back">Back</option>
+                        <option value="Chest">Chest</option>
+                        <option value="Shoulders">Shoulders</option>
+                        <option value="Legs">Legs</option>
+                        <option value="Cardio">Cardio</option>
+                    </select>
+                
+                <div class="form-group">
+                    <label for="trained_by">Trained By</label>
+                    <select name="trained_by" class="form-control mb-2" required>
+                        {% for trainer in SelectTrainer %}
+                        <option value="{{ trainer.id }}">{{ trainer.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary" type="submit">Submit Attendance</button>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-3"></div>
+    </div>
+</div>
+{% endblock head %}
