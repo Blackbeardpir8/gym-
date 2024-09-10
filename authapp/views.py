@@ -6,12 +6,13 @@ from django.contrib.auth.decorators import login_required
 from authapp.models import Contact,Enrollment,Membership_Plan,Trainer,Attendance
 from datetime import datetime
 from django.db.models import Count
+from django.urls import reverse
 
 
 def Home(request):
     return render(request, "index.html")
 
-
+@login_required
 def profile(request, enroll_id=None):
     if not request.user.is_authenticated:
         messages.warning(request, "Please log in and try again.")
@@ -175,11 +176,13 @@ def enroll(request):
     return render(request, "enroll.html", context)
 
 
-@login_required
 def attendance(request):
+    if not request.user.is_authenticated:
+        messages.warning(request, "Please log in and try again.")
+        return redirect('/login')
     # Fetch the list of trainers to display in the form
-    SelectTrainer = Trainer.objects.all()
-    context = {"SelectTrainer": SelectTrainer}
+    select_trainer = Trainer.objects.all()
+    context = {"SelectTrainer": select_trainer}
 
     # Handle form submission
     if request.method == 'POST':
@@ -213,13 +216,20 @@ def attendance(request):
         )
         attendance.save()  # Save to the database
         messages.success(request, "Attendance recorded successfully!")
-        return redirect('/attendance')
+        return redirect('attendance')  # Redirect to the attendance page
 
     # Render the attendance form in GET request
     return render(request, "attendance.html", context)
 
-@login_required
+
+    # Render the attendance form in GET request
+    return render(request, "attendance.html", context)
+
+
 def tracker(request):
+    if not request.user.is_authenticated:
+        messages.warning(request, "Please log in and try again.")
+        return redirect('/login')
     now = datetime.now()
     current_year = now.year
     current_month = now.month
@@ -279,3 +289,5 @@ def tracker(request):
     }
     return render(request, "tracker.html", context)
 
+def services(request):
+    return render(request,"services.html")
