@@ -12,7 +12,6 @@ from django.urls import reverse
 def Home(request):
     return render(request, "index.html")
 
-@login_required
 def profile(request, enroll_id=None):
     if not request.user.is_authenticated:
         messages.warning(request, "Please log in and try again.")
@@ -74,7 +73,6 @@ def signup(request):
 
     return render(request, "signup.html")
 
-# Login View
 def handlelogin(request):
     if request.method == "POST":
         username = request.POST.get('usernumber')
@@ -118,18 +116,18 @@ def contact(request):
 
 
 def enroll(request):
-    # Check if the user is authenticated
+
     if not request.user.is_authenticated:
         messages.warning(request, "Please log in and try again.")
         return redirect('/login')
 
-    # Get memberships and trainers to display in the form
+    
     memberships = Membership_Plan.objects.all().order_by('price')
     trainers = Trainer.objects.all()
     context = {"memberships": memberships, "trainers": trainers}
 
     if request.method == "POST":
-        # Get form data
+        
         fullname = request.POST.get('fullname')
         email = request.POST.get('email')
         gender = request.POST.get('gender')
@@ -141,7 +139,6 @@ def enroll(request):
         address = request.POST.get('address')
         emergency_contact = request.POST.get('emergency_contact')
 
-        # Get the selected membership and trainer
         try:
             membership = Membership_Plan.objects.get(id=member_id)
             trainer = Trainer.objects.get(id=trainer_id)
@@ -152,7 +149,6 @@ def enroll(request):
             messages.error(request, "Selected trainer does not exist.")
             return redirect('enroll')
 
-        # Create a new Enrollment entry
         query = Enrollment(
             fullname=fullname,
             email=email,
@@ -163,13 +159,11 @@ def enroll(request):
             select_trainer=trainer,
             reference=reference,
             address=address,
-            emergency_contact=emergency_contact  # Save emergency contact
+            emergency_contact=emergency_contact  
         )
 
-        # Save the enrollment data to the database
         query.save()
 
-        # Display a success message and redirect
         messages.success(request, "Thanks for enrolling!")
         return redirect('/')
 
@@ -180,49 +174,42 @@ def attendance(request):
     if not request.user.is_authenticated:
         messages.warning(request, "Please log in and try again.")
         return redirect('/login')
-    # Fetch the list of trainers to display in the form
+    
     select_trainer = Trainer.objects.all()
     context = {"SelectTrainer": select_trainer}
 
-    # Handle form submission
     if request.method == 'POST':
         phone = request.POST.get('phone')
         select_date = request.POST.get('select_date')
         login_time = request.POST.get('login')
         logout_time = request.POST.get('logout')
         workout_type = request.POST.get('select_workout')
-        trainer_id = request.POST.get('trained_by')  # Use trainer_id from the form
+        trainer_id = request.POST.get('trained_by')
 
-        # Check if the form fields are filled
         if not (select_date and login_time and logout_time and workout_type and trainer_id):
             messages.error(request, "All fields are required.")
             return render(request, "attendance.html", context)
 
-        # Try to fetch the selected trainer by their ID
         try:
             trainer = Trainer.objects.get(id=trainer_id)
         except Trainer.DoesNotExist:
             messages.error(request, "Selected trainer does not exist.")
             return render(request, "attendance.html", context)
 
-        # Create the attendance record
         attendance = Attendance(
             phone=phone,
             select_date=select_date,
             login=login_time,
             logout=logout_time,
             select_workout=workout_type,
-            trained_by=trainer  # Use the selected trainer
+            trained_by=trainer
         )
-        attendance.save()  # Save to the database
+        attendance.save() 
         messages.success(request, "Attendance recorded successfully!")
-        return redirect('attendance')  # Redirect to the attendance page
+        return redirect('attendance') 
 
-    # Render the attendance form in GET request
     return render(request, "attendance.html", context)
 
-
-    # Render the attendance form in GET request
     return render(request, "attendance.html", context)
 
 
@@ -234,7 +221,6 @@ def tracker(request):
     current_year = now.year
     current_month = now.month
 
-    # List of months and years for dropdown
     months = [
         ('01', 'January'), ('02', 'February'), ('03', 'March'),
         ('04', 'April'), ('05', 'May'), ('06', 'June'),
@@ -243,11 +229,9 @@ def tracker(request):
     ]
     years = [str(year) for year in range(current_year - 10, current_year + 1)]
 
-    # Get the selected year and month from GET request
     selected_year = request.GET.get('year', str(current_year))
     selected_month = request.GET.get('month', str(current_month).zfill(2))
 
-    # Validate year and month
     valid_years = years
     valid_months = dict(months).keys()
     if selected_year not in valid_years:
@@ -255,14 +239,12 @@ def tracker(request):
     if selected_month not in valid_months:
         selected_month = str(current_month).zfill(2)
 
-    # Fetch attendance records for the selected year and month
     attendance_records = Attendance.objects.filter(
         phone=request.user.username,
         select_date__year=selected_year,
         select_date__month=selected_month
     )
 
-    # Fetch monthly attendance summary
     monthly_attendance = (
         Attendance.objects.filter(phone=request.user.username)
         .values('select_date__year', 'select_date__month')
@@ -270,10 +252,8 @@ def tracker(request):
         .order_by('select_date__year', 'select_date__month')
     )
 
-    # Fetch unique workout types from Attendance records
     workout_types = Attendance.objects.values_list('select_workout', flat=True).distinct()
 
-    # Debugging output (optional)
     print("Monthly Attendance:", list(monthly_attendance))
     print("Attendance Records:", list(attendance_records))
     print("Workout Types:", list(workout_types))

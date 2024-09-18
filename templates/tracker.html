@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+
 {% block title %}
 Tracker
 {% endblock title %}
@@ -6,9 +7,9 @@ Tracker
 {% block head %}
 <h1>{{ request.user.username }}'s Tracker</h1>
 
-<div class="container col-md-11">
+<div class="container mt-5 tracker-form-container">
     <div class="row">
-        <div class="col-md-11">
+        <div class="col-md-12">
             {% for message in messages %}
             <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
                 {{ message }}
@@ -17,40 +18,50 @@ Tracker
             {% endfor %}
         </div>
 
-        <div class="col-md-11">
+        <div class="col-md-12">
             <!-- Select Year, Month, and Workout Type Form -->
             <form method="get" action="{% url 'tracker' %}">
-                <div class="form-group">
-                    <label for="year">Select Year</label>
-                    <select id="year" name="year" class="form-control" onchange="this.form.submit()">
-                        <option value="" disabled>Select a year</option>
-                        {% for year in years %}
-                        <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}</option>
-                        {% endfor %}
-                    </select>
+                <div class="row gy-4">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="year">Select Year</label>
+                            <select id="year" name="year" class="form-control" onchange="this.form.submit()">
+                                <option value="" disabled>Select a year</option>
+                                {% for year in years %}
+                                <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="month">Select Month</label>
+                            <select id="month" name="month" class="form-control" onchange="this.form.submit()">
+                                <option value="" disabled>Select a month</option>
+                                {% for month in months %}
+                                <option value="{{ month.0 }}" {% if month.0 == selected_month %}selected{% endif %}>{{ month.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="workout_type">Select Workout Type</label>
+                            <select id="workout_type" name="workout_type" class="form-control">
+                                <option value="" disabled>Select a workout type</option>
+                                {% for workout_type in workout_types %}
+                                <option value="{{ workout_type }}">{{ workout_type }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="month">Select Month</label>
-                    <select id="month" name="month" class="form-control" onchange="this.form.submit()">
-                        <option value="" disabled>Select a month</option>
-                        {% for month in months %}
-                        <option value="{{ month.0 }}" {% if month.0 == selected_month %}selected{% endif %}>{{ month.1 }}</option>
-                        {% endfor %}
-                    </select>
+                <div class="d-grid gap-2 mt-3">
+                    <button type="submit" class="btn btn-primary">Filter</button>
                 </div>
-                <div class="form-group">
-                    <label for="workout_type">Select Workout Type</label>
-                    <select id="workout_type" name="workout_type" class="form-control">
-                        <option value="" disabled>Select a workout type</option>
-                        {% for workout_type in workout_types %}
-                        <option value="{{ workout_type }}">{{ workout_type }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary">Filter</button>
             </form>
 
-            <h5>Monthly Attendance Summary</h5>
+            <h5 class="mt-5">Monthly Attendance Summary</h5>
             <table class="table table-striped">
                 <thead>
                     <tr>
@@ -74,7 +85,7 @@ Tracker
                 </tbody>
             </table>
 
-            <h5>Detailed Attendance Records</h5>
+            <h5 class="mt-5">Detailed Attendance Records</h5>
             <table class="table table-striped">
                 <thead>
                     <tr>
