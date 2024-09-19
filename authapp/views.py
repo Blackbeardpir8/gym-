@@ -272,4 +272,5 @@ def tracker(request):
     }
     return render(request, "tracker.html", context)
 
-
+def services(request):
+    return render(request, "services.html")
