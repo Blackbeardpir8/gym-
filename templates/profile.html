@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-
 {% block title %}
 Profile
 {% endblock title %}
@@ -8,19 +7,21 @@ Profile
 
 <h1>{{ request.user.username }}'s Profile</h1>
 
-<div class="container mt-5 profile-container">
+<div class="container">
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-3"></div>
+
+        <div class="col-md-8">
             {% for message in messages %}
             <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
                 {{ message }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             {% endfor %}
-
+            
             {% if posts %}
             {% for post in posts %}
-            <ul class="list-group profile-list">
+            <ul class="list-group">
                 <li class="list-group-item">Full Name: {{ post.fullname }}</li>
                 <li class="list-group-item">Email: {{ post.email }}</li>
                 <li class="list-group-item">Gender: {{ post.gender }}</li>
@@ -42,6 +43,8 @@ Profile
             {% endif %}
 
         </div>
+
+        <div class="col-md-3"></div>
     </div>
 </div>
 

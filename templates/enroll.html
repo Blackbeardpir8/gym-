@@ -1,15 +1,16 @@
 {% extends 'base.html' %}
-
 {% block title %}
 Enroll
 {% endblock title %}
-
 {% block head %}
+
 <h1>Enroll with Us</h1>
 
-<div class="container mt-5 enroll-form-container">
+<div class="container mt-2">
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-3"></div>
+
+        <div class="col-md-8">
             {% for message in messages %}
             <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
                 {{ message }}
@@ -17,87 +18,87 @@ Enroll
             </div>
             {% endfor %}
 
-            <!-- Enrollment Form -->
-            <form action="/enroll" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
-                {% csrf_token %}
+            <form action="/enroll" method="post">
+            {% csrf_token %}
 
-                <div class="row gy-4">
-                    <!-- Full Name -->
-                    <div class="col-md-12 mb-3">
-                        <input type="text" class="form-control" name="fullname" placeholder="Enter your Full Name" required>
-                    </div>
+            <!-- Full Name -->
+            <div class="form-group">
+                <input type="text" class="form-control" name="fullname" placeholder="Enter your Full Name" required >
+            </div>
 
-                    <!-- Email -->
-                    <div class="col-md-12 mb-3">
-                        <input type="email" class="form-control" value="{{ request.user.email }}" name="email" placeholder="Enter your Email" readonly required>
-                    </div>
+            <!-- Email -->
+            <div class="form-group mt-3">
+                <input type="email" class="form-control" value="{{ request.user.email }}" name="email" placeholder="Enter your Email" required readonly>
+            </div>
 
-                    <!-- Phone -->
-                    <div class="col-md-12 mb-3">
-                        <input type="tel" class="form-control" name="phone" value="{{ request.user.username }}" placeholder="Enter your Phone Number" readonly required>
-                    </div>
+            <!-- Phone -->
+            <div class="form-group mt-3">
+                <input type="tel" class="form-control" value="{{ request.user.username }}" name="phone" placeholder="Enter your Phone Number" required readonly>
+            </div>
 
-                    <!-- Date of Birth (dob) -->
-                    <div class="col-md-12 mb-3">
-                        <label for="dob">Date of Birth</label>
-                        <input type="date" class="form-control" id="dob" name="dob" placeholder="Date of Birth" required>
-                    </div>
+            <!-- Date of Birth (dob) -->
+            <div class="form-group mt-3">
+                <label for="dob">Date of Birth</label>
+                <input type="date" class="form-control" id="dob" name="dob" placeholder="dd-mm-yyyy" required>
+            </div>
 
-                    <!-- Gender -->
-                    <div class="col-md-12 mb-3">
-                        <select class="form-control" name="gender" required>
-                            <option value="" disabled selected>Select Gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
+            <!-- Gender -->
+            <div class="form-group mt-3">
+                <select class="form-control" name="gender" required>
+                    <option value="" disabled selected>Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
 
-                    <!-- Membership Plan -->
-                    <div class="col-md-12 mb-3">
-                        <select class="form-control" name="select_membership" required>
-                            <option value="" disabled selected>Select Membership Plan</option>
-                            {% for membership in memberships %}
-                                <option value="{{ membership.id }}">{{ membership.plan }} {{membership.price}}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
+            <!-- Membership Plan -->
+            <div class="form-group mt-3">
+                <select class="form-control" name="select_membership" required>
+                    <option value="" disabled selected>Select Membership Plan</option>
+                    
+                    {% for membership in memberships %}
+                        <option value="{{ membership.id }}">{{ membership.plan }} {{membership.price}}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-                    <!-- Trainer -->
-                    <div class="col-md-12 mb-3">
-                        <select class="form-control" name="trainer" required>
-                            <option value="" disabled selected>Select Trainer</option>
-                            {% for trainer in trainers %}
-                                <option value="{{ trainer.id }}">{{ trainer.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
+            <!-- Trainer -->
+            <div class="form-group mt-3">
+                <select class="form-control" name="trainer" required>
+                    <option value="" disabled selected>Select Trainer</option>
+                    
+                    {% for trainer in trainers %}
+                        <option value="{{ trainer.id }}">{{ trainer.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-                    <!-- Reference -->
-                    <div class="col-md-12 mb-3">
-                        <input type="text" class="form-control" name="reference" placeholder="Reference (optional)">
-                    </div>
+            <!-- Reference -->
+            <div class="form-group mt-3">
+                <input type="text" class="form-control" name="reference" placeholder="Reference (optional)">
+            </div>
 
-                    <!-- Address -->
-                    <div class="col-md-12 mb-3">
-                        <textarea class="form-control" name="address" placeholder="Enter your Address" rows="3" required></textarea>
-                    </div>
+            <!-- Address -->
+            <div class="form-group mt-3">
+                <textarea class="form-control" name="address" placeholder="Enter your Address" rows="3" required></textarea>
+            </div>
 
-                    <!-- Emergency Contact -->
-                    <div class="col-md-12 mb-3">
-                        <input type="tel" class="form-control" name="emergency_contact" placeholder="Enter Emergency Contact Number" required>
-                    </div>
+            <!-- Emergency Contact -->
+            <div class="form-group mt-3">
+                <input type="tel" class="form-control" name="emergency_contact" placeholder="Enter Emergency Contact Number" required>
+            </div>
 
-                    <div class="col-md-12 text-center">
-                        <div class="loading">Loading</div>
-                        <div class="error-message"></div>
-                        <div class="sent-message">Your enrollment has been submitted. Thank you!</div>
+            <br>
+            <div class="d-grid gap-2">
+                <button class="btn btn-warning" type="submit">Enroll</button>
+            </div>
 
-                        <button type="submit" class="btn btn-warning">Enroll</button>
-                    </div>
-                </div>
             </form>
+
         </div>
+
+        <div class="col-md-3"></div>
     </div>
 </div>
 

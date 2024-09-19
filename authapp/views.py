@@ -6,7 +6,6 @@ from django.contrib.auth.decorators import login_required
 from authapp.models import Contact,Enrollment,Membership_Plan,Trainer,Attendance
 from datetime import datetime
 from django.db.models import Count
-from django.urls import reverse
 
 
 def Home(request):
@@ -16,10 +15,11 @@ def profile(request, enroll_id=None):
     if not request.user.is_authenticated:
         messages.warning(request, "Please log in and try again.")
         return redirect('/login')
-    user_phone = request.user
+
+    user_phone = request.user.username
     posts = Enrollment.objects.filter(phone=user_phone)
-    context = {"posts":posts}
-    return render(request, "profile.html",context)
+    context = {"posts": posts}
+    return render(request, "profile.html", context)
 
 
 def signup(request):
@@ -105,10 +105,16 @@ def contact(request):
         phone = request.POST.get('phone')
         description = request.POST.get('description')
 
-        user_contact = Contact(name=name, email=email, phone=phone, description=description)
-        user_contact.save()
+        if not all([name, email, phone, description]):
+            messages.error(request, "All fields are required.")
+            return redirect('/contact')
 
-        messages.info(request, "Thanks for contacting us! We will get back to you as soon as possible.")
+        try:
+            user_contact = Contact(name=name, email=email, phone=phone, description=description)
+            user_contact.save()
+            messages.success(request, "Thanks for contacting us! We will get back to you as soon as possible.")
+        except Exception as e:
+            messages.error(request, f"An error occurred: {e}")
 
         return redirect('/contact')
 
@@ -116,18 +122,15 @@ def contact(request):
 
 
 def enroll(request):
-
     if not request.user.is_authenticated:
         messages.warning(request, "Please log in and try again.")
         return redirect('/login')
 
-    
     memberships = Membership_Plan.objects.all().order_by('price')
     trainers = Trainer.objects.all()
     context = {"memberships": memberships, "trainers": trainers}
 
     if request.method == "POST":
-        
         fullname = request.POST.get('fullname')
         email = request.POST.get('email')
         gender = request.POST.get('gender')
@@ -138,6 +141,10 @@ def enroll(request):
         reference = request.POST.get('reference')
         address = request.POST.get('address')
         emergency_contact = request.POST.get('emergency_contact')
+
+        if Enrollment.objects.filter(phone=phone_number).exists():
+            messages.info(request, "You are already enrolled with us.")
+            return redirect('/profile')
 
         try:
             membership = Membership_Plan.objects.get(id=member_id)
@@ -159,7 +166,7 @@ def enroll(request):
             select_trainer=trainer,
             reference=reference,
             address=address,
-            emergency_contact=emergency_contact  
+            emergency_contact=emergency_contact
         )
 
         query.save()
@@ -210,13 +217,13 @@ def attendance(request):
 
     return render(request, "attendance.html", context)
 
-    return render(request, "attendance.html", context)
 
 
 def tracker(request):
     if not request.user.is_authenticated:
         messages.warning(request, "Please log in and try again.")
         return redirect('/login')
+
     now = datetime.now()
     current_year = now.year
     current_month = now.month
@@ -243,7 +250,7 @@ def tracker(request):
         phone=request.user.username,
         select_date__year=selected_year,
         select_date__month=selected_month
-    )
+    ).order_by('-select_date')
 
     monthly_attendance = (
         Attendance.objects.filter(phone=request.user.username)
@@ -253,10 +260,6 @@ def tracker(request):
     )
 
     workout_types = Attendance.objects.values_list('select_workout', flat=True).distinct()
-
-    print("Monthly Attendance:", list(monthly_attendance))
-    print("Attendance Records:", list(attendance_records))
-    print("Workout Types:", list(workout_types))
 
     context = {
         'monthly_attendance': monthly_attendance,
@@ -269,5 +272,4 @@ def tracker(request):
     }
     return render(request, "tracker.html", context)
 
-def services(request):
-    return render(request,"services.html")
+
